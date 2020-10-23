@@ -1,0 +1,61 @@
+from tkinter import *
+import numpy as np
+import skfuzzy as fuzz
+from skfuzzy import control as ctrl
+
+def show_data():
+    try:
+        waterl=float(ent.get())
+        flowr=float(ent2.get())
+    except ValueError:
+         print("Thats an erroe")
+    
+    waterlevel = ctrl.Antecedent(np.arange(0, 101, 1), 'waterlevel')
+    flowrate = ctrl.Antecedent(np.arange(0, 101, 1), 'flowrate')
+    spillgate = ctrl.Consequent(np.arange(0, 101, 1), 'spillgate')
+
+
+    waterlevel.automf(3)
+    flowrate.automf(3)
+
+
+    spillgate['low'] = fuzz.trimf(spillgate.universe, [0, 15, 35])
+    spillgate['medium'] = fuzz.trimf(spillgate.universe, [30, 45, 65])
+    spillgate['high'] = fuzz.trimf(spillgate.universe, [60, 75, 100])
+    waterlevel['average'].view()
+    flowrate.view()
+    spillgate.view()
+    rule1 = ctrl.Rule(waterlevel['poor'] | flowrate['poor'], spillgate['low'])
+    rule2 = ctrl.Rule(flowrate['average'], spillgate['medium'])
+    rule3 = ctrl.Rule(flowrate['good'] | waterlevel['good'], spillgate['high'])
+
+    rule1.view()
+    tipping_ctrl = ctrl.ControlSystem([rule1, rule2, rule3])
+    tipping = ctrl.ControlSystemSimulation(tipping_ctrl)
+
+    tipping.input['waterlevel'] = waterl
+    tipping.input['flowrate'] = flowr
+
+
+    tipping.compute()
+    print (tipping.output['spillgate'])
+    spillgate.view(sim=tipping)
+root = Tk()
+root.geometry("400x400")
+
+L1=Label(root,text="Water Level: ")
+L2=Label(root,text="Flow Rate: ")
+
+ent=Entry(root)
+ent2=Entry(root)
+
+L1.grid(row=0)
+L2.grid(row=1)
+ent.grid(row=0,column=1)
+ent2.grid(row=1,column=1)
+
+btn = Button(root,text="Check Gate Openess",bg="blue",fg="white",command=show_data)
+btn.grid(row=3,columnspan=3)
+
+
+root.mainloop()
