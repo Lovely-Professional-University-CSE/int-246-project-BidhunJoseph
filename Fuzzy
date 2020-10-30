@@ -30,13 +30,11 @@ def show_data():
     rule2 = ctrl.Rule(flowrate['average'], spillgate['medium'])
     rule3 = ctrl.Rule(flowrate['good'] | waterlevel['good'], spillgate['high'])
     rule4 = ctrl.Rule(flowrate['poor'] | waterlevel['good'], spillgate['high'])
-    rule5 = ctrl.Rule(flowrate['average'] | waterlevel['average'], spillgate['medium'])
-    rule6 = ctrl.Rule(flowrate['poor'] | waterlevel['average'], spillgate['medium'])
+    rule5 = ctrl.Rule(flowrate['average'] | waterlevel['average'], spillgate['high'])
+    rule6 = ctrl.Rule(flowrate['poor'] | waterlevel['average'], spillgate['low'])
     rule7 = ctrl.Rule(flowrate['average'] | waterlevel['poor'], spillgate['low'])
-    rule8 = ctrl.Rule(flowrate['good'] | waterlevel['average'], spillgate['medium'])
-    rule9 = ctrl.Rule(flowrate['average'] | waterlevel['good'], spillgate['high'])
     rule1.view()
-    tipping_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8, rule9])
+    tipping_ctrl = ctrl.ControlSystem([rule1, rule2, rule3, rule4, rule5, rule6, rule7])
     tipping = ctrl.ControlSystemSimulation(tipping_ctrl)
 
     tipping.input['waterlevel'] = waterl
@@ -44,7 +42,8 @@ def show_data():
 
 
     tipping.compute()
-    print (tipping.output['spillgate'])
+    spill=tipping.output['spillgate']
+    print (spill)
     spillgate.view(sim=tipping)
 root = Tk()
 root.geometry("400x400")
@@ -56,6 +55,14 @@ background_label.place(relheight=1,relwidth=1)
 
 L1=Label(root,text="Water Level(In meters): ")
 L2=Label(root,text="Flow Rate(In L/min): ")
+O=Label(root,text=None).grid(row=4,column=0)
+O=Label(root,text=None).grid(row=5,column=0)
+O=Label(root,text=None).grid(row=6,column=0)
+O=Label(root,text=None).grid(row=7,column=0)
+O=Label(root,text=None).grid(row=8,column=0)
+O=Label(root,text=None).grid(row=9,column=0)
+O1=Label(root, text="Spillway Gate openess will be generated in the terminal").grid(row=10,column=0)
+O2=Label(root, text="Closing the window will show the plots ").grid(row=11,column=0)  
 
 ent=Entry(root)
 ent2=Entry(root)
